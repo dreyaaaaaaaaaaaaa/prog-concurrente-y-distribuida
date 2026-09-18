@@ -8,7 +8,6 @@ class Process {
 private:
     string id;
     int time_remaining;
-    bool status;   // 0 == blocked 1 == ready
 
 public:
     Process(string id, int time) : 
@@ -26,13 +25,13 @@ public:
                                                                     // El scheduler gestiona la cola de procesos READY y el algoritmo Round-Robin
 class Scheduler {
 private:
-    queue<Process> ready;                       // Cola de procesos esperando CPU
+    queue<Process> ready, blocked;                       // Cola de procesos esperando CPU
     int quantum;                        // Máximo tiempo que cada proceso puede usar CPU
 
 public:
     Scheduler(int q) : quantum(q) {}
 
-    void addProcess(Process p) {
+    void addProcess(const Process& p) {   // para evitar una copia no necesaria
         ready.push(p);
     }
 
