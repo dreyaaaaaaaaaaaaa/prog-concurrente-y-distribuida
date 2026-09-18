@@ -8,10 +8,13 @@ class Process {
 private:
     string id;
     int time_remaining;
+    int time_restante_antes_blocked;
+    int blocked_time_restante;
+    bool bloqueado;
 
 public:
     Process(string id, int time) : 
-    id(id), time_remaining(time) {}
+    id(id), time_remaining(time), time_restante_antes_blocked(time), blocked_time_restante(time), bloqueado() {}
 
     string getId() { return id; }
     int getTime() { return time_remaining; }
@@ -32,7 +35,7 @@ public:
     Scheduler(int q) : quantum(q) {}
 
     void addProcess(const Process& p) {   // para evitar una copia no necesaria
-        ready.push(p);                    // aca le dejo crear una copia para que se quede con un process despues del fin de addprocess
+        ready.push(p);                    // aca le dejo crear una copia para que se quede con un process despues del fin d addprocess
     }
 
                                             // Simula el scheduler ejecutando procesos con Round-Robin
@@ -50,6 +53,9 @@ public:
                 cout << "Preemption - volviendo a  estado READY" << endl;
                 ready.push(p);
             } 
+            elif (p.{
+
+            }
             else {
                                                                                 // Si terminó, se elimina
                 cout << "Proceso " << p.getId() << " TERMINADO" << endl;
