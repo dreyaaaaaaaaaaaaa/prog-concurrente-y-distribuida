@@ -10,11 +10,12 @@ private:
     int time_remaining;
     int time_restante_antes_blocked;
     int blocked_time_restante;
-    bool bloqueado;
+    bool debe_bloquear;
+    bool ya_bloqueado;
 
 public:
-    Process(string id, int time) : 
-    id(id), time_remaining(time), time_restante_antes_blocked(time), blocked_time_restante(time), bloqueado() {}
+    Process(string id, int time, bool will_bloque, int time_antes, int time_block_res) : 
+    id(id), time_remaining(time), time_restante_antes_blocked(time_antes), blocked_time_restante(time_block_res), debe_bloquear(false) {}                     // logica del scheduler, un processo puede esta bloqueado nada mas una vez, el usuaria cin time_restantes_anes_blocked y blocked_time_restante
 
     string getId() { return id; }
     int getTime() { return time_remaining; }
@@ -23,6 +24,8 @@ public:
         time_remaining -= quantum;
         if (time_remaining < 0) time_remaining = 0;
     }
+
+    void debe_bloquear()
 };
 
                                                                     // El scheduler gestiona la cola de procesos READY y el algoritmo Round-Robin
