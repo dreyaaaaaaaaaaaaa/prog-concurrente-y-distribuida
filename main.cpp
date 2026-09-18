@@ -32,7 +32,7 @@ public:
     Scheduler(int q) : quantum(q) {}
 
     void addProcess(const Process& p) {   // para evitar una copia no necesaria
-        ready.push(p);
+        ready.push(p);                    // aca le dejo crear una copia para que se quede con un process despues del fin de addprocess
     }
 
                                             // Simula el scheduler ejecutando procesos con Round-Robin
