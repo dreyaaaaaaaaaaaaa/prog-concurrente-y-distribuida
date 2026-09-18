@@ -25,7 +25,9 @@ public:
         if (time_remaining < 0) time_remaining = 0;
     }
 
-    void debe_bloquear()
+    bool debe_bloquear_eje(){                                                                                
+            return debe_bloquear && time_restante_antes_blocked <= 0 && blocked_time_restante > 0 && !ya_bloqueado;        // update de los valores para blocked        
+    }
 };
 
                                                                     // El scheduler gestiona la cola de procesos READY y el algoritmo Round-Robin
