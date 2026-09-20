@@ -15,14 +15,22 @@ private:
 
 public:
     Process(string id, int time, bool will_bloque, int time_antes, int time_block_res) : 
-    id(id), time_remaining(time), time_restante_antes_blocked(time_antes), blocked_time_restante(time_block_res), debe_bloquear(false) {}                     // logica del scheduler, un processo puede esta bloqueado nada mas una vez, el usuaria cin time_restantes_anes_blocked y blocked_time_restante
+    id(id), time_remaining(time), time_restante_antes_blocked(time_antes), blocked_time_restante(time_block_res), debe_bloquear(will_bloque), ya_bloqueado(false){}                     // logica del scheduler, un processo puede esta bloqueado nada mas una vez, el usuaria cin time_restantes_anes_blocked y blocked_time_restante
 
     string getId() { return id; }
     int getTime() { return time_remaining; }
                                                                         // El proceso usa la CPU por "quantum" unidades de tiempo
     void execute(int quantum) {
         time_remaining -= quantum;
-        if (time_remaining < 0) time_remaining = 0;
+        if (time_remaining < 0) {
+            time_remaining = 0;
+        }
+        if (debe_bloquear && !ya_bloqueado){
+            time_restante_antes_blocked -= quantum;
+            if (time_restante_antes_blocked < 0){
+                time_restante_antes_blocked = 0;
+            }
+        }
     }
 
     bool debe_bloquear_eje(){                                                                                
