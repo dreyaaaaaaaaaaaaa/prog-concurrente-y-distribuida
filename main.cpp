@@ -25,12 +25,16 @@ public:
         if (time_remaining < 0) {
             time_remaining = 0;
         }
-        if (debe_bloquear && !ya_bloqueado){
+        if (debe_bloquear && !ya_bloqueado){                    // bajar el tiempo de blocked con el quantum 
             time_restante_antes_blocked -= quantum;
             if (time_restante_antes_blocked < 0){
                 time_restante_antes_blocked = 0;
             }
         }
+    }
+
+    void marcar_bloqueado(){
+        ya_bloqueado = true;
     }
 
     bool debe_bloquear_eje(){                                                                                
@@ -66,9 +70,6 @@ public:
                 cout << "Preemption - volviendo a  estado READY" << endl;
                 ready.push(p);
             } 
-            elif (p.{
-
-            }
             else {
                                                                                 // Si terminó, se elimina
                 cout << "Proceso " << p.getId() << " TERMINADO" << endl;
@@ -93,12 +94,23 @@ int main() {
     for (int i = 0; i < numProcesses; i++) {
         string id;
         int time;  // str asi no se produce error al meter un id como p1 ect....
+        bool will_bloque;
+        int time_antes = 0;
+        int time_block_res = 0;
         cout << "Proceso " << (i + 1) << ":" << endl;
         cout << "  ID (numero): ";
         cin >> id;
         cout << "  Tiempo de ejecucion: ";
         cin >> time;
-        sched.addProcess(Process(id, time));
+        cout << "  Debe bloquearse? (0 = no, 1 = si): ";
+        cin >> will_bloque;
+        if (will_bloque) {
+            cout << "  Tiempo antes de bloquearse: ";
+            cin >> time_antes;
+            cout << "  Duracion del bloqueo: ";
+            cin >> time_block_res;
+        }
+        sched.addProcess(Process(id, time, will_bloque, time_antes, time_block_res));
     }
 
     cout << "" << endl;
