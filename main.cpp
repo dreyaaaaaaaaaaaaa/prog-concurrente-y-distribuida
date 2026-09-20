@@ -40,6 +40,13 @@ public:
     bool debe_bloquear_eje(){                                                                                
             return debe_bloquear && time_restante_antes_blocked <= 0 && blocked_time_restante > 0 && !ya_bloqueado;        // update de los valores para blocked        
     }
+
+    void esperar(int quantum){
+        blocked_time_restante -= quantum;
+        if(blocked_time_restante < 0){
+            blocked_time_restante = 0;
+        }
+    }
 };
 
                                                                     // El scheduler gestiona la cola de procesos READY y el algoritmo Round-Robin
@@ -57,7 +64,15 @@ public:
 
                                             // Simula el scheduler ejecutando procesos con Round-Robin
     void simulate() {
-        while (!ready.empty()) {
+        while (!ready.empty() || !blocked.empty()) {
+
+            int cantidad_bloqueados = blocked.size();
+            for(int i = 0, i < cantidad_bloqueados, i++){
+                Process proceso_bloqueado = blocked.front();
+                blocked.pop();
+                proceso_bloqueado.esperar(quantum);
+                
+            }
             Process proceso_bloqueado = blocked.front();
             blocked.pop();
             if (!proceso_bloqueado.debe_bloquear_eje()){
