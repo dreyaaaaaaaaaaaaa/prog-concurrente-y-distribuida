@@ -58,6 +58,12 @@ public:
                                             // Simula el scheduler ejecutando procesos con Round-Robin
     void simulate() {
         while (!ready.empty()) {
+            Process proceso_bloqueado = blocked.front();
+            blocked.pop();
+            if (!proceso_bloqueado.debe_bloquear_eje()){
+                ready.push(proceso_bloqueado);
+                cout << "el proceso vuelve a estar READY"
+            }
             Process p = ready.front();
             ready.pop();
 
@@ -66,7 +72,7 @@ public:
             cout << "Tiempo restante: " << p.getTime() << endl;
 
             if (p.getTime() > 0) {
-                if (p.debe_bloquear_eje() == true){                                                               // Si aún tiene tiempo, vuelve a la cola (Preemption)
+                if (p.debe_bloquear_eje()){                                                               // Si aún tiene tiempo, vuelve a la cola (Preemption)
                 p.marcar_bloqueado();
                 cout << "Blocked - Estado update a bloqueado hasta el tiempo restante";
                 blocked.push(p);
