@@ -71,14 +71,14 @@ public:
 
             int cantidad_bloqueados = blocked.size();
 
-            for(int i = 0, i < cantidad_bloqueados, i++){
+            for(int i = 0; i < cantidad_bloqueados; i++){          // Bucle para recorrer todos los procesos bloqueados y aplicar el esperar o volver a ponerlos el estado ready
                 Process proceso_bloqueado = blocked.front();
                 blocked.pop();
                 proceso_bloqueado.esperar(quantum);
 
                 if(proceso_bloqueado.puede_desbloquearse()){
                     ready.push(proceso_bloqueado);
-                    cout << "Proceso" << proceso_bloqueado.getId() << "vuelve a estado READY" << endl; 
+                    cout << "Proceso : " << proceso_bloqueado.getId() << " vuelve a estado READY" << endl; 
                 }
                 else {
                     blocked.push(proceso_bloqueado);
@@ -99,7 +99,7 @@ public:
             if (p.getTime() > 0) {
                 if (p.debe_bloquear_eje()){                                                               // Si aún tiene tiempo, vuelve a la cola (Preemption)
                 p.marcar_bloqueado();
-                cout << "Blocked - Estado update a bloqueado hasta el tiempo restante";
+                cout << "Blocked  proceso : " << p.getId() << " Estado update a bloqueado hasta el tiempo restante" << endl;
                 blocked.push(p);
                 }
                 else {
@@ -121,7 +121,6 @@ int main() {
     cout << "     SCHEDULER SIMULADOR    " << endl;
     cout << "Ingrese el Quantum: ";
     cin >> quantum;
-
     cout << "Ingrese el numero de procesos: ";
     cin >> numProcesses;
 
