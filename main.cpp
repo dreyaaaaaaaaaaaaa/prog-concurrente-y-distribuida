@@ -69,8 +69,31 @@ public:
     void simulate() {
         while (!ready.empty() || !blocked.empty()) {
 
-            int cantidad_bloqueados = blocked.size();
+            
+            if (ready.empty ()){
+                cout << "CPU bloquado" << endl;
+                int cantidad_bloqueados = blocked.size();
+                for(int i = 0; i < cantidad_bloqueados; i++){          // Bucle para recorrer todos los procesos bloqueados y aplicar el esperar o volver a ponerlos el estado ready
+                Process proceso_bloqueado = blocked.front();
+                blocked.pop();
+                proceso_bloqueado.esperar(quantum);
 
+                if(proceso_bloqueado.puede_desbloquearse()){
+                    ready.push(proceso_bloqueado);
+                    cout << "Proceso : " << proceso_bloqueado.getId() << " vuelve a estado READY" << endl; 
+                }
+                else {
+                    blocked.push(proceso_bloqueado);
+                }
+            }
+            }
+
+            Process p = ready.front();
+            ready.pop();
+
+            cout << "Proceso " << p.getId() << " - RUNNING" << endl;
+            p.execute(quantum);                      // Usa quantum unidades de tiempo
+            int cantidad_bloqueados = blocked.size();
             for(int i = 0; i < cantidad_bloqueados; i++){          // Bucle para recorrer todos los procesos bloqueados y aplicar el esperar o volver a ponerlos el estado ready
                 Process proceso_bloqueado = blocked.front();
                 blocked.pop();
@@ -84,16 +107,7 @@ public:
                     blocked.push(proceso_bloqueado);
                 }
             }
-            if (ready.empty ()){
-                cout << "CPU bloquado" << endl;
-                continue;
-            }
 
-            Process p = ready.front();
-            ready.pop();
-
-            cout << "Proceso " << p.getId() << " - RUNNING" << endl;
-            p.execute(quantum);                                                                     // Usa quantum unidades de tiempo
             cout << "Tiempo restante: " << p.getTime() << endl;
 
             if (p.getTime() > 0) {
