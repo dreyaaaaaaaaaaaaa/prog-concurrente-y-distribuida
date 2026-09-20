@@ -47,6 +47,9 @@ public:
             blocked_time_restante = 0;
         }
     }
+    bool puede_desbloquearse(){
+        return blocked_time_restante == 0;
+    }
 };
 
                                                                     // El scheduler gestiona la cola de procesos READY y el algoritmo Round-Robin
@@ -67,18 +70,25 @@ public:
         while (!ready.empty() || !blocked.empty()) {
 
             int cantidad_bloqueados = blocked.size();
+
             for(int i = 0, i < cantidad_bloqueados, i++){
                 Process proceso_bloqueado = blocked.front();
                 blocked.pop();
                 proceso_bloqueado.esperar(quantum);
-                
+
+                if(proceso_bloqueado.puede_desbloquearse()){
+                    ready.push(proceso_bloqueado);
+                    cout << "Proceso" << proceso_bloqueado.getId() << "vuelve a estado READY" << endl; 
+                }
+                else {
+                    blocked.push(proceso_bloqueado);
+                }
             }
-            Process proceso_bloqueado = blocked.front();
-            blocked.pop();
-            if (!proceso_bloqueado.debe_bloquear_eje()){
-                ready.push(proceso_bloqueado);
-                cout << "el proceso vuelve a estar READY"
+            if (ready.empty ()){
+                cout << "CPU bloquado" << endl;
+                continue;
             }
+
             Process p = ready.front();
             ready.pop();
 
