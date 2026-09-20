@@ -66,9 +66,15 @@ public:
             cout << "Tiempo restante: " << p.getTime() << endl;
 
             if (p.getTime() > 0) {
-                                                                                // Si aún tiene tiempo, vuelve a la cola (Preemption)
-                cout << "Preemption - volviendo a  estado READY" << endl;
-                ready.push(p);
+                if (p.debe_bloquear_eje() == true){                                                               // Si aún tiene tiempo, vuelve a la cola (Preemption)
+                p.marcar_bloqueado();
+                cout << "Blocked - Estado update a bloqueado hasta el tiempo restante";
+                blocked.push(p);
+                }
+                else {
+                    cout << "Preemption - volviendo a  estado READY" << endl;
+                    ready.push(p);
+                }
             } 
             else {
                                                                                 // Si terminó, se elimina
