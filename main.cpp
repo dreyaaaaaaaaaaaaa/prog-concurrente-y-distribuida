@@ -78,19 +78,31 @@ public:
     }
 
     void esperar_bloqueados(int tiempo){              // ahora en vez de hacer lo en el algoritmo estq directeamente en scheduler
-        int cantidad_bloqueados = blocked.size();
-        for(int i = 0; i < cantidad_bloqueados; i++){
-            Process proceso_bloqueado = blocked.front();
-            blocked.pop();
-            proceso_bloqueado.esperar(tiempo);
-
-            if(proceso_bloqueado.puede_desbloquearse()){               
-                ready.push(proceso_bloqueado);
-                cout << "Proceso : " << proceso_bloqueado.getId() << " vuelve a estado READY" << endl;
-            }
-            else {
+        while(tiempo > 0 && !blocked.empty()){
+            int tiempo_paso = tiempo;
+            int cantidad_bloqueados = blocked.size();
+            for(int i = 0; i < cantidad_bloqueados; i++){
+                Process proceso_bloqueado = blocked.front();
+                blocked.pop();
+                if(proceso_bloqueado.getBlockedTime() < tiempo_paso){
+                    tiempo_paso = proceso_bloqueado.getBlockedTime();
+                }
                 blocked.push(proceso_bloqueado);
             }
+            for(int i = 0; i < cantidad_bloqueados; i++){
+                Process proceso_bloqueado = blocked.front();
+                blocked.pop();
+                proceso_bloqueado.esperar(tiempo_paso);
+
+                if(proceso_bloqueado.puede_desbloquearse()){
+                    ready.push(proceso_bloqueado);
+                    cout << "Proceso : " << proceso_bloqueado.getId() << " vuelve a estado READY" << endl;
+                }
+                else {
+                    blocked.push(proceso_bloqueado);
+                }
+            }
+            tiempo -= tiempo_paso;
         }
     }
 
@@ -218,6 +230,10 @@ int main() {
     }
     cout << "Ingrese el numero de procesos: ";
     cin >> numProcesses;
+    if (!cin || numProcesses < 0){
+        cout << "Numero de procesos invalido" << endl;
+        return 1;
+    }
 
     Scheduler sched(quantum);
 
@@ -235,11 +251,19 @@ int main() {
         cin >> time;
         cout << "  Debe bloquearse ? (0 = no, 1 = si): ";
         cin >> will_bloque;
+        if (!cin){
+            cout << "Datos del proceso invalidos" << endl;
+            return 1;
+        }
         if (will_bloque) {
             cout << "  Tiempo antes de bloquearse: ";
             cin >> time_antes;
             cout << "  Duracion del bloqueo: ";
             cin >> time_block_res;
+        }
+        if (!cin || time <= 0 || (will_bloque && (time_antes < 0 || time_block_res <= 0))){
+            cout << "Datos del proceso invalidos" << endl;
+            return 1;
         }
         sched.addProcess(Process(id, time, will_bloque, time_antes, time_block_res));
     }
