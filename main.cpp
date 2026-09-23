@@ -51,6 +51,8 @@ public:
         return blocked_time_restante == 0;
     }
 
+    int getBlockedTime() { return blocked_time_restante; }
+
     //parte FCFS
 
     int tiempo_hasta_siguiente_event(){
@@ -73,6 +75,23 @@ public:
 
     void addProcess(const Process& p) {   // para evitar una copia no necesaria
         ready.push(p);                    // aca le dejo crear una copia para que se quede con un process despues del fin d addprocess
+    }
+
+    void esperar_bloqueados(int tiempo){              // ahora en vez de hacer lo en el algoritmo estq directeamente en scheduler
+        int cantidad_bloqueados = blocked.size();
+        for(int i = 0; i < cantidad_bloqueados; i++){
+            Process proceso_bloqueado = blocked.front();
+            blocked.pop();
+            proceso_bloqueado.esperar(tiempo);
+
+            if(proceso_bloqueado.puede_desbloquearse()){               
+                ready.push(proceso_bloqueado);
+                cout << "Proceso : " << proceso_bloqueado.getId() << " vuelve a estado READY" << endl;
+            }
+            else {
+                blocked.push(proceso_bloqueado);
+            }
+        }
     }
 
                                             // Simula el scheduler ejecutando procesos con Round-Robin
@@ -142,21 +161,46 @@ public:
         }
     }
 
+                                                                                // Nuevo algoritmo de first come first served  
     void simulate_fcfs(){
-        while (!ready.empty()) {
+        while (!ready.empty() || !blocked.empty()) {              
+            if (ready.empty()){        
+                cout << "CPU bloquado" << endl;
+                int tiempo_espera = blocked.front().getBlockedTime();
+                int cantidad_bloqueados = blocked.size();
+                for(int i = 0; i < cantidad_bloqueados; i++){
+                    Process proceso_bloqueado = blocked.front();
+                    blocked.pop();
+                    if(proceso_bloqueado.getBlockedTime() < tiempo_espera){
+                        tiempo_espera = proceso_bloqueado.getBlockedTime();
+                    }
+                    blocked.push(proceso_bloqueado);
+                }
+                esperar_bloqueados(tiempo_espera);
+            }             // aca nos ocupamos de los procesos que estab bloqueados
+
             Process p = ready.front();
-            ready.pop();
-            cout<<"Proceso " << p.getId() << " - RUNNING" << endl;
-            p.execute(p.getTime());
+            ready.pop();                                                    
+            cout<<"Proceso " << p.getId() << " - RUNNING" << endl;              
+            int tiempo_ejecutando = p.tiempo_hasta_siguiente_event();              // llamando a tiempo hastas siguiente event antes del exec y despues comprobar si se tiene que acabar
+            p.execute(tiempo_ejecutando);
+            esperar_bloqueados(tiempo_ejecutando);
             cout << "Tiempo restante: " << p.getTime() << endl;
-            cout << "Proceso " << p.getId() << " TERMINADO" << endl;
+            if(p.getTime() == 0){
+                cout << "Proceso " << p.getId() << " TERMINADO" << endl;
+            }
+            else if(p.debe_bloquear_eje()){             // bloquear
+                p.marcar_bloqueado();
+                cout << "Blocked  proceso : " << p.getId() << " Estado update a bloqueado hasta el tiempo restante" << endl;
+                blocked.push(p);
+            }
         }
     }
 };
 
 int main() {
     int quantum = 1, numProcesses, algoritmo;
-
+                                                                            // comienzo del output en la terminal
     cout << "     SCHEDULER SIMULADOR    " << endl;
     cout << "Algoritmo (1 = Round-Robin, 2 = FCFS): ";
     cin >> algoritmo;
@@ -196,10 +240,6 @@ int main() {
             cin >> time_antes;
             cout << "  Duracion del bloqueo: ";
             cin >> time_block_res;
-        }
-        if (algoritmo == 2 && will_bloque){
-            cout << "FCFS no admite procesos bloqueados" << endl;
-            return 1;
         }
         sched.addProcess(Process(id, time, will_bloque, time_antes, time_block_res));
     }
