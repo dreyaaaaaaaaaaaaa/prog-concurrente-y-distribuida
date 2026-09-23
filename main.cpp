@@ -58,7 +58,7 @@ public:
         if (debe_bloquear && !ya_bloqueado && time_restante_antes_blocked < tiempo_ejecutando){
             tiempo_ejecutando = time_restante_antes_blocked;
         }
-        return tiempo_ejecutando
+        return tiempo_ejecutando;
     }
 };
 
@@ -95,7 +95,11 @@ public:
                 else {
                     blocked.push(proceso_bloqueado);
                 }
+                }
             }
+
+            if (ready.empty()){
+                continue;
             }
 
             Process p = ready.front();
@@ -139,40 +143,35 @@ public:
     }
 
     void simulate_fcfs(){
-        while (!ready.empty() || !blocked.empty()) {
-
-           if (ready.empty ()){
-                cout << "CPU bloquado" << endl;
-                int cantidad_bloqueados = blocked.size();
-                for(int i = 0; i < cantidad_bloqueados; i++){          // misma logica de bloqueado que round_robin
-                    Process proceso_bloqueado = blocked.front();
-                    blocked.pop();
-                    proceso_bloqueado.esperar(tiempo_ejecutado);
-
-                    if(proceso_bloqueado.puede_desbloquearse()){
-                        ready.push(proceso_bloqueado);
-                        cout << "Proceso : " << proceso_bloqueado.getId() << " vuelve a estado READY" << endl; 
-                    }
-                    else {
-                        blocked.push(proceso_bloqueado);
-                    }
-                }
-            } 
+        while (!ready.empty()) {
             Process p = ready.front();
             ready.pop();
             cout<<"Proceso " << p.getId() << " - RUNNING" << endl;
-            int tiempo_ejecutando = p.tiempo_hasta_siguiente_event();
-
+            p.execute(p.getTime());
+            cout << "Tiempo restante: " << p.getTime() << endl;
+            cout << "Proceso " << p.getId() << " TERMINADO" << endl;
         }
     }
 };
 
 int main() {
-    int quantum, numProcesses;
+    int quantum = 1, numProcesses, algoritmo;
 
     cout << "     SCHEDULER SIMULADOR    " << endl;
-    cout << "Ingrese el Quantum: ";
-    cin >> quantum;
+    cout << "Algoritmo (1 = Round-Robin, 2 = FCFS): ";
+    cin >> algoritmo;
+    if (!cin || (algoritmo != 1 && algoritmo != 2)){
+        cout << "Algoritmo invalido" << endl;
+        return 1;
+    }
+    if (algoritmo == 1){
+        cout << "Ingrese el Quantum: ";
+        cin >> quantum;
+        if (!cin || quantum <= 0){
+            cout << "Quantum invalido" << endl;
+            return 1;
+        }
+    }
     cout << "Ingrese el numero de procesos: ";
     cin >> numProcesses;
 
@@ -190,7 +189,7 @@ int main() {
         cin >> id;
         cout << "  Tiempo de ejecucion: ";
         cin >> time;
-        cout << "  Debe bloquearse? (0 = no, 1 = si): ";
+        cout << "  Debe bloquearse ? (0 = no, 1 = si): ";
         cin >> will_bloque;
         if (will_bloque) {
             cout << "  Tiempo antes de bloquearse: ";
@@ -198,13 +197,19 @@ int main() {
             cout << "  Duracion del bloqueo: ";
             cin >> time_block_res;
         }
+        if (algoritmo == 2 && will_bloque){
+            cout << "FCFS no admite procesos bloqueados" << endl;
+            return 1;
+        }
         sched.addProcess(Process(id, time, will_bloque, time_antes, time_block_res));
     }
 
     cout << "" << endl;
-    sched.simulate_round_robin();
-
-    cout << "Presione cualquier tecla para salir...";
-    system("pause");
+    if (algoritmo == 1){
+        sched.simulate_round_robin();
+    }
+    else {
+        sched.simulate_fcfs();
+    }
     return 0;
 }
