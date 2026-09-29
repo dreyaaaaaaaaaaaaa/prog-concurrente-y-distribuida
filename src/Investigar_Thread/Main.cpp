@@ -2,19 +2,12 @@
 #include <thread>
 using namespace std;
 
-void Tarea(){
-    cout << "Thread secundario" << endl;
-}
-
 void greetings(int id){
     cout << "Hello from Thread " << id << "(real id :"
     << std::this_thread::get_id() << ") \n";            
 }
 
 int main(){
-    thread Hilo(Tarea);
-    Hilo.join();
-    cout << "Thread principal" << endl;
     thread t1(greetings, 1);
     thread t2(greetings, 2);
     thread t3(greetings, 3);
@@ -23,5 +16,6 @@ int main(){
     t2.join();
     t3.join();
     t4.join();
+    cout << "Thread principal" << endl;
     return 0;
 }
