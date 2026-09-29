@@ -11,15 +11,15 @@ void factorial(int number) {
          << " is " << factorial_value << "\n";
 }
 
-int maint(){
-    thread t1(factorial, 1);
-    thread t2(factorial, 2);
-    thread t3(factorial, 3);
-    thread t4(factorial, 4);
+int main(){
+    thread t1(factorial, 5);
+    thread t2(factorial, 6);
+    thread t3(factorial, 7);
+    thread t4(factorial, 8);
     t1.join();
     t2.join();
     t3.join();
     t4.join();
-    cout << "" << endl;
+    cout << "thread principal" << endl;
     return 0;
 }
