@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 using namespace std;
 
 void factorial(int number) {
@@ -11,5 +12,14 @@ void factorial(int number) {
 }
 
 int maint(){
-    
+    thread t1(factorial, 1);
+    thread t2(factorial, 2);
+    thread t3(factorial, 3);
+    thread t4(factorial, 4);
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+    cout << "" << endl;
+    return 0;
 }
