@@ -1,2 +1,6 @@
 ﻿add_subdirectory(Practica1)
 add_subdirectory(Scheduler)
+find_package(Threads REQUIRED)
+foreach(practica Practica3_1 Practica3_2 Practica3_3 Practica3_4 Prac_1M)
+    add_subdirectory(${practica})
+endforeach()
