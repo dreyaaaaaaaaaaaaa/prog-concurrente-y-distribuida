@@ -2,24 +2,24 @@
 #include <thread>
 using namespace std;
 
-const int ITERACIONES = 1000000;
 const int PRUEBAS = 5;
 long long contador = 0;
 
-void incrementar() {
-    for (int i = 0; i < ITERACIONES; i++) {
+void incrementar(int iteraciones) {
+    for (int i = 0; i < iteraciones; i++) {
         contador++;
     }
 }
 
-int main() {
-    long long esperado = 4LL * ITERACIONES;
+void realizarPruebas(int iteraciones) {
+    long long esperado = 4LL * iteraciones;
+    cout << "Iteraciones por hilo: " << iteraciones << endl;
     for (int prueba = 1; prueba <= PRUEBAS; prueba++) {
         contador = 0;
-        thread hilo1(incrementar);
-        thread hilo2(incrementar);
-        thread hilo3(incrementar);
-        thread hilo4(incrementar);
+        thread hilo1(incrementar, iteraciones);
+        thread hilo2(incrementar, iteraciones);
+        thread hilo3(incrementar, iteraciones);
+        thread hilo4(incrementar, iteraciones);
         hilo1.join();
         hilo2.join();
         hilo3.join();
@@ -34,5 +34,10 @@ int main() {
         }
         cout << endl;
     }
+}
+
+int main() {
+    realizarPruebas(1000000);
+    realizarPruebas(10);
     return 0;
 }
